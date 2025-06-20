@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Bíblico - Episódio: A Porta Estreita</title>
+  <style>
+    /* Estilo Netflix-like */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      background: #141414;
+      color: #e5e5e5;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: #1f1f1f;
+      max-width: 720px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .cover {
+      position: relative;
+      background: url('https://i.im.ge/2025/06/21/JOKWR9.Imagem-do-WhatsApp-de-2025-06-20-as-18-32-07-1a299f09.jpeg') center center/cover no-repeat;
+      height: 320px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-shadow: 0 0 10px #ff0000;
+      font-size: 2.6rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 0%, #141414 90%);
+      pointer-events: none;
+    }
+
+    .content {
+      padding: 30px 30px 40px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      color: #e50914; /* Vermelho Netflix */
+      font-size: 2.4rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    h2 {
+      font-weight: 600;
+      margin-bottom: 15px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .welcome p {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #ccc;
+      margin: 10px 0 20px;
+      text-align: center;
+    }
+
+    button {
+      background: #e50914;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 12px 20px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    button:hover {
+      background: #b0060f;
+    }
+
+    .question {
+      margin-bottom: 30px;
+    }
+
+    .options button {
+      margin: 8px 0;
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 12px 15px;
+      background: #333;
+      color: #fff;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .options button:hover {
+      background: #e50914;
+      border-color: #fff;
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 20px;
+      color: #ccc;
+    }
+
+    .score {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin: 10px 0;
+      color: #e50914;
+    }
+
+    .blessing {
+      font-style: italic;
+      color: #a3d9a5;
+      margin-top: 20px;
+      font-size: 1rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label=>
+    <div class="cover" aria-hidden="true">
+       <br> <span style="font-size:1.6rem;"></span>
+    </div>
+    <div class="content">
+      <div id="quiz">
+        <section class="welcome" aria-live="polite">
+          <h1>📖 Bem-vindo ao Quiz Bíblico</h1>
+          <p>Que a graça e a paz do nosso Senhor Jesus Cristo estejam com você!</p>
+          <p>Prepare-se para um desafio espiritual com 15 perguntas sobre <strong>"A Porta Estreita, o Caminho e a Vida"</strong>.</p>
+          <p>⚠️ Se errar, você volta ao início. Mas não desanime — cada tentativa é uma oportunidade de crescimento espiritual!</p>
+          <button id="start-btn">Começar Quiz</button>
+        </section>
+
+        <section class="question hidden" aria-live="polite">
+          <h2 id="question-title"></h2>
+          <div class="options" id="options" role="list"></div>
+        </section>
+
+        <section class="result hidden" aria-live="polite">
+          <h2 id="result-title"></h2>
+          <p class="score" id="score-text"></p>
+          <p id="final-message"></p>
+          <p class="blessing" id="blessing-message"></p>
+          <button id="restart-btn">Recomeçar Quiz</button>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "O que Jesus ensina em Mateus 7:12?",
+        options: [
+          "Amar ao próximo como a si mesmo",
+          "Fazer aos outros o que queremos que façam a nós",
+          "Não julgar ninguém",
+          "Guardar os mandamentos"
+        ],
+        answer: "Fazer aos outros o que queremos que façam a nós"
+      },
+      {
+        question: "Qual é o caminho que conduz à vida, segundo Mateus 7:14?",
+        options: [
+          "A porta larga",
+          "O caminho fácil",
+          "A porta estreita",
+          "A lei de Moisés"
+        ],
+        answer: "A porta estreita"
+      },
+      {
+        question: "O que acontece com quem escolhe o caminho da desobediência?",
+        options: [
+          "Recebe bênçãos",
+          "Encontra paz",
+          "Segue para destruição",
+          "É exaltado"
+        ],
+        answer: "Segue para destruição"
+      },
+      {
+        question: "Qual deve ser a atitude de um cristão verdadeiro?",
+        options: [
+          "Esperar pelos outros",
+          "Aguardar mudanças",
+          "Ser agente de transformação",
+          "Buscar recompensas"
+        ],
+        answer: "Ser agente de transformação"
+      },
+      {
+        question: "Qual princípio Jesus destacou em Mateus 7:12?",
+        options: [
+          "Justiça",
+          "Misericórdia",
+          "Regra de ouro",
+          "Fé"
+        ],
+        answer: "Regra de ouro"
+      },
+      {
+        question: "Por que poucos encontram a porta estreita?",
+        options: [
+          "Porque não têm fé",
+          "Porque ela exige esforço e renúncia",
+          "Porque é invisível",
+          "Porque não é ensinada"
+        ],
+        answer: "Porque ela exige esforço e renúncia"
+      },
+      {
+        question: "O que Jesus disse sobre quem entra por Ele?",
+        options: [
+          "Receberá bênçãos",
+          "Será salvo",
+          "Terá riquezas",
+          "Terá glória"
+        ],
+        answer: "Será salvo"
+      },
+      {
+        question: "Sansão caiu em pecado porque...",
+        options: [
+          "Foi traído por seus pais",
+          "Brincou com o pecado",
+          "Negou sua fé",
+          "Desobedeceu à lei de Moisés"
+        ],
+        answer: "Brincou com o pecado"
+      },
+      {
+        question: "O gadareno, após encontrar Cristo, teve sua vida...",
+        options: [
+          "Arruinada",
+          "Transformada",
+          "Envergonhada",
+          "Pecaminosa"
+        ],
+        answer: "Transformada"
+      },
+      {
+        question: "A desobediência parece fácil, mas leva à...",
+        options: [
+          "Santificação",
+          "Morte física",
+          "Perdição",
+          "Prosperidade"
+        ],
+        answer: "Perdição"
+      },
+      {
+        question: "Segundo Lucas 9:23, o que devemos fazer para seguir Jesus?",
+        options: [
+          "Guardar o sábado",
+          "Negar a si mesmo e tomar a cruz",
+          "Ir ao templo",
+          "Obedecer aos fariseus"
+        ],
+        answer: "Negar a si mesmo e tomar a cruz"
+      },
+      {
+        question: "O que significa ‘renunciar a si mesmo’ na prática cristã?",
+        options: [
+          "Viver isolado",
+          "Negar prazeres terrenos",
+          "Ser passivo",
+          "Buscar milagres"
+        ],
+        answer: "Negar prazeres terrenos"
+      },
+      {
+        question: "Quem caminha pela porta larga, segundo o sermão?",
+        options: [
+          "Tropeça sorrindo",
+          "Tem sucesso",
+          "Vive em santidade",
+          "Alcança a eternidade"
+        ],
+        answer: "Tropeça sorrindo"
+      },
+      {
+        question: "O que acontece ao conquistar o mundo e perder a alma?",
+        options: [
+          "É recompensado",
+          "Nada se perde",
+          "É inútil",
+          "É exaltado"
+        ],
+        answer: "É inútil"
+      },
+      {
+        question: "Segundo a ministração, o que nasce da obediência?",
+        options: [
+          "Castigo",
+          "Milagres",
+          "Julgamento",
+          "Dúvida"
+        ],
+        answer: "Milagres"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const welcomeSection = document.querySelector('.welcome');
+    const questionSection = document.querySelector('.question');
+    const resultSection = document.querySelector('.result');
+    const questionTitle = document.getElementById('question-title');
+    const optionsContainer = document.getElementById('options');
+    const resultTitle = document.getElementById('result-title');
+    const scoreText = document.getElementById('score-text');
+    const finalMessage = document.getElementById('final-message');
+    const blessingMessage = document.getElementById('blessing-message');
+
+    startBtn.addEventListener('click', () => {
+      welcomeSection.classList.add('hidden');
+      questionSection.classList.remove('hidden');
+      showQuestion();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      resetQuiz();
+    });
+
+    function showQuestion() {
+      const q = quizData[currentQuestion];
+      questionTitle.textContent = `Pergunta ${currentQuestion + 1}: ${q.question}`;
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option;
+        btn.setAttribute('role', 'listitem');
+        btn.addEventListener('click', () => checkAnswer(option));
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const correct = quizData[currentQuestion].answer;
+      if (selected === correct) {
+        score++;
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+          showQuestion();
+        } else {
+          showResult(true);
+        }
+      } else {
+        // Errou, volta ao início
+        showResult(false);
+      }
+    }
+
+    function showResult(passed) {
+      questionSection.classList.add('hidden');
+      resultSection.classList.remove('hidden');
+      if (passed) {
+        resultTitle.textContent = "Parabéns! Você concluiu o quiz com sucesso.";
+        scoreText.textContent = `Sua pontuação: ${score} de ${quizData.length}`;
+        finalMessage.textContent = "Você escolheu a porta estreita e caminhou pela vida em obediência.";
+        blessingMessage.textContent = "Que Deus continue a te abençoar e fortalecer na fé!";
+      } else {
+        resultTitle.textContent = "Ops! Você escolheu o caminho largo e precisa tentar novamente.";
+        scoreText.textContent = `Sua pontuação: ${score} de ${quizData.length}`;
+        finalMessage.textContent = "Mas não desista, levante-se e siga firme na caminhada espiritual.";
+        blessingMessage.textContent = "A graça de Deus te renove a cada dia!";
+      }
+    }
+
+    function resetQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      resultSection.classList.add('hidden');
+      welcomeSection.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
